@@ -1,0 +1,70 @@
+<!-- public/app.html -->
+<!doctype html>
+<meta charset="utf-8" />
+<title>Kennel RPG — 대시보드</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  body{font-family:system-ui,Segoe UI;margin:0;background:#0f172a;color:#e2e8f0}
+  header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #1f2937}
+  main{padding:16px}
+  .btn{padding:8px 12px;border:0;border-radius:8px;background:#334155;color:#e2e8f0;cursor:pointer}
+  .btn-primary{background:#2563eb}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px}
+  .card{background:#111827;border:1px solid #1f2937;border-radius:12px;padding:16px}
+  .muted{opacity:.8;font-size:13px}
+</style>
+
+<header>
+  <div>KENNEL RPG</div>
+  <div>
+    <button id="btnLogout" class="btn">로그아웃</button>
+  </div>
+</header>
+
+<main>
+  <div class="card">
+    <h2>로그인 상태</h2>
+    <div id="who" class="muted">확인 중…</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h3>관리자(추가 예정)</h3>
+      <ul>
+        <li>방 생성</li>
+        <li>맵 제작/수정</li>
+        <li>채팅 로그 확인</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>클라이언트(추가 예정)</h3>
+      <ul>
+        <li>방 선택 후 입장</li>
+        <li>실시간 채팅</li>
+        <li>대표자 1인 컨트롤</li>
+      </ul>
+    </div>
+  </div>
+</main>
+
+<script src="./js/config.js"></script>
+<script type="module">
+  import { supabase } from "./js/supaClient.js";
+  const $ = (id)=>document.getElementById(id);
+
+  // 로그인 정보 표시
+  {
+    const { data } = await supabase.auth.getUser();
+    if (!data?.user) {
+      location.href = "/";
+    } else {
+      $("who").textContent = `email: ${data.user.email} | id: ${data.user.id}`;
+    }
+  }
+
+  // 로그아웃
+  $("btnLogout").onclick = async () => {
+    await supabase.auth.signOut();
+    location.href = "/";
+  };
+</script>

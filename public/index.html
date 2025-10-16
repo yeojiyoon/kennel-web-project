@@ -1,0 +1,67 @@
+<!-- public/index.html -->
+<!doctype html>
+<meta charset="utf-8" />
+<title>Kennel RPG — 로그인</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  body{font-family:system-ui,Segoe UI;margin:0;display:grid;place-items:center;height:100vh;background:#0f172a;color:#e2e8f0}
+  .card{width:360px;max-width:92vw;background:#111827;border:1px solid #1f2937;border-radius:12px;padding:20px;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+  h1{margin:0 0 16px;font-size:20px}
+  label{display:block;margin:10px 0 6px;font-size:13px;opacity:.9}
+  input{width:100%;padding:10px;border-radius:8px;border:1px solid #374151;background:#0b1220;color:#e5e7eb}
+  button{width:100%;padding:10px;border:0;border-radius:8px;margin-top:12px;background:#2563eb;color:white;font-weight:600;cursor:pointer}
+  .muted{font-size:12px;opacity:.8;margin-top:12px;text-align:center}
+</style>
+
+<div class="card">
+  <h1>로그인 / 회원가입</h1>
+  <label>이메일</label>
+  <input id="email" placeholder="you@example.com" />
+  <label>비밀번호</label>
+  <input id="password" type="password" placeholder="••••••••" />
+  <button id="btnLogin">로그인 / 회원가입 </button>
+  <div class="muted" id="status">상태: 대기 중</div>
+</div>
+
+<script src="./js/config.js"></script> <!-- ← config.example.js를 복사해 config.js를 생성 -->
+<script type="module">
+  import { supabase } from "./js/supaClient.js";
+
+  const $ = (id)=>document.getElementById(id);
+  const status = $("status");
+
+  // 초기 세션 읽기
+  {
+    const { data } = await supabase.auth.getSession();
+    if (data?.session) {
+      status.textContent = "이미 로그인됨 → 이동 중…";
+      location.href = "/app.html";
+    }
+  }
+
+  $("btnLogin").onclick = async () => {
+    const email = $("email").value.trim();
+    const pw = $("password").value.trim();
+    if (!email || !pw) {
+      status.textContent = "이메일/비밀번호를 입력하세요.";
+      return;
+    }
+
+    // 1) 로그인 시도
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password: pw });
+    if (!error) {
+      status.textContent = "로그인 성공! 이동 중…";
+      location.href = "/app.html";
+      return;
+    }
+
+    // 2) 없으면 가입
+    const up = await supabase.auth.signUp({ email, password: pw });
+    if (up.error) {
+      status.textContent = "회원가입 실패: " + up.error.message;
+      return;
+    }
+    // Supabase에서 "이메일 인증 필요"를 켜둔 경우:
+    status.innerHTML = "회원가입 성공!<br>이메일 인증이 켜져 있다면 메일의 확인 링크를 클릭한 뒤 다시 로그인하세요.";
+  };
+</script>

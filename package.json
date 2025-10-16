@@ -1,0 +1,17 @@
+{
+  "name": "kennel-web-project",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon server/server.js",
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
